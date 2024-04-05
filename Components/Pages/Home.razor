@@ -1,10 +1,12 @@
-﻿@page "/"
+﻿@inject IStringLocalizer<Resource> localizer
+
+@page "/"
 @page "/Home"
 
 <PageTitle>Home</PageTitle>
 
 
-<MudText Typo="Typo.h2" GutterBottom="true">Welcome to Damien's Playground!</MudText>
+<MudText Typo="Typo.h2" GutterBottom="true">@localizer["WelcomeMessage"]</MudText>
 <MudText Class="mb-6" Typo="Typo.subtitle1">This website is developed with <b>MudBlazor</b>, <b>Bootstrap 5</b> and the <b>.NET 8</b> in Visual Studio 2022.</MudText>
 
 

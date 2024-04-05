@@ -117,283 +117,61 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ActualBig" xml:space="preserve">
-    <value>总大</value>
+  <data name="AboutMe" xml:space="preserve">
+    <value>关于我</value>
   </data>
-  <data name="ActualSmall" xml:space="preserve">
-    <value>总小</value>
+  <data name="AboutTheDemo" xml:space="preserve">
+    <value>关于演示</value>
   </data>
-  <data name="Amount" xml:space="preserve">
-    <value>总共</value>
+  <data name="BackgroundTaskDemo" xml:space="preserve">
+    <value>后台任务演示</value>
   </data>
-  <data name="AmountIs" xml:space="preserve">
-    <value>金额</value>
+  <data name="ComponentShowcase" xml:space="preserve">
+    <value>组件展示</value>
   </data>
-  <data name="Back" xml:space="preserve">
-    <value>后退</value>
+  <data name="DamienPlayground" xml:space="preserve">
+    <value>Damien's 游乐场</value>
   </data>
-  <data name="BetHistory" xml:space="preserve">
-    <value>投注历史页</value>
+  <data name="Footer1" xml:space="preserve">
+    <value>Damien's 游乐场是由 Damien Chin</value>
   </data>
-  <data name="BetHistory4D" xml:space="preserve">
-    <value>4D 投注历史记录</value>
+  <data name="Footer2" xml:space="preserve">
+    <value>版权所有 © 版权所有 2024</value>
   </data>
-  <data name="BettingForm4D" xml:space="preserve">
-    <value>4D 投注表格</value>
-  </data>
-  <data name="Big" xml:space="preserve">
-    <value>大</value>
-  </data>
-  <data name="BigIs" xml:space="preserve">
-    <value>大</value>
-  </data>
-  <data name="Blank" xml:space="preserve">
-    <value>空白</value>
-  </data>
-  <data name="ChangePassword" xml:space="preserve">
-    <value>更改密码</value>
-  </data>
-  <data name="ConfirmPassword" xml:space="preserve">
-    <value>确认新密码</value>
-  </data>
-  <data name="CreatedByIs" xml:space="preserve">
-    <value>由...制作：</value>
-  </data>
-  <data name="CreateNewMember" xml:space="preserve">
-    <value>创建新成员</value>
-  </data>
-  <data name="Currency" xml:space="preserve">
-    <value>货币</value>
-  </data>
-  <data name="Date" xml:space="preserve">
-    <value>日期</value>
-  </data>
-  <data name="Day" xml:space="preserve">
-    <value>天</value>
-  </data>
-  <data name="Days" xml:space="preserve">
-    <value>天</value>
-  </data>
-  <data name="DaysAndLegendDescription" xml:space="preserve">
-    <value>天和图例说明</value>
-  </data>
-  <data name="Details" xml:space="preserve">
-    <value>细节</value>
-  </data>
-  <data name="Download" xml:space="preserve">
-    <value>下载</value>
-  </data>
-  <data name="DrawDate1" xml:space="preserve">
-    <value>抽奖日期一</value>
-  </data>
-  <data name="DrawDate2" xml:space="preserve">
-    <value>抽奖日期二</value>
-  </data>
-  <data name="DrawDate3" xml:space="preserve">
-    <value>抽奖日期三</value>
-  </data>
-  <data name="First3Roll" xml:space="preserve">
-    <value>前 3 位数字动</value>
-  </data>
-  <data name="From" xml:space="preserve">
-    <value>来自</value>
+  <data name="HistoryDemo" xml:space="preserve">
+    <value>历史演示</value>
   </data>
   <data name="Home" xml:space="preserve">
     <value>主页</value>
   </data>
-  <data name="InvoiceDateFrom" xml:space="preserve">
-    <value>发票日期自</value>
-  </data>
-  <data name="InvoiceDetailsFor" xml:space="preserve">
-    <value>发票详细信息 ：</value>
-  </data>
-  <data name="InvoiceForIs" xml:space="preserve">
-    <value>发票为</value>
-  </data>
-  <data name="InvoiceForMemberId" xml:space="preserve">
-    <value>会员 ID 发票 :</value>
-  </data>
-  <data name="InvoiceId" xml:space="preserve">
-    <value>发票 Id</value>
-  </data>
-  <data name="InvoiceTotal" xml:space="preserve">
-    <value>发票总计</value>
-  </data>
   <data name="LanguageSelect" xml:space="preserve">
-    <value>Language : </value>
-  </data>
-  <data name="Last3Roll" xml:space="preserve">
-    <value>后 3 位数字动</value>
-  </data>
-  <data name="Legend" xml:space="preserve">
-    <value>图例说明</value>
+    <value>Select Language</value>
   </data>
   <data name="Login" xml:space="preserve">
-    <value>登录</value>
-  </data>
-  <data name="LoginID" xml:space="preserve">
-    <value>登录 ID</value>
-  </data>
-  <data name="LogMeIn" xml:space="preserve">
     <value>登录</value>
   </data>
   <data name="Logout" xml:space="preserve">
     <value>登出</value>
   </data>
-  <data name="ManageAccountHeader" xml:space="preserve">
-    <value>管理您的帐户</value>
+  <data name="ManagementDemo" xml:space="preserve">
+    <value>管理演示</value>
   </data>
-  <data name="ManageMember" xml:space="preserve">
-    <value>管理会员</value>
+  <data name="MassFormDemo" xml:space="preserve">
+    <value>大众形式演示</value>
   </data>
-  <data name="Media" xml:space="preserve">
-    <value>媒体类型</value>
+  <data name="ModifyTaskDemo" xml:space="preserve">
+    <value>修改任务演示</value>
   </data>
-  <data name="Member" xml:space="preserve">
-    <value>成员</value>
+  <data name="Registration" xml:space="preserve">
+    <value>登记</value>
   </data>
-  <data name="MemberId" xml:space="preserve">
-    <value>成员 Id</value>
+  <data name="Settings" xml:space="preserve">
+    <value>设置</value>
   </data>
-  <data name="NewPassword" xml:space="preserve">
-    <value>新密码</value>
-  </data>
-  <data name="NoDataToShow" xml:space="preserve">
-    <value>没有数据可显示</value>
-  </data>
-  <data name="NoDateRangeSelectedYet" xml:space="preserve">
-    <value>尚未选择日期范围</value>
-  </data>
-  <data name="NoInvoiceSelectedYet" xml:space="preserve">
-    <value>尚未选择发票</value>
-  </data>
-  <data name="Number" xml:space="preserve">
-    <value>数字</value>
-  </data>
-  <data name="OldPassword" xml:space="preserve">
-    <value>旧密码</value>
-  </data>
-  <data name="PageName" xml:space="preserve">
-    <value>页面名</value>
-  </data>
-  <data name="PageNameIs" xml:space="preserve">
-    <value>页面名称</value>
-  </data>
-  <data name="PageReportPage" xml:space="preserve">
-    <value>页面报告</value>
-  </data>
-  <data name="Password" xml:space="preserve">
-    <value>密码</value>
-  </data>
-  <data name="PersonalData" xml:space="preserve">
-    <value>个人资料</value>
-  </data>
-  <data name="PhoneNumber" xml:space="preserve">
-    <value>电话号码</value>
-  </data>
-  <data name="PlaceBets" xml:space="preserve">
-    <value>下注页</value>
-  </data>
-  <data name="Profile" xml:space="preserve">
-    <value>你的个人资料</value>
-  </data>
-  <data name="RememberMe" xml:space="preserve">
-    <value>记住账号</value>
-  </data>
-  <data name="Report" xml:space="preserve">
-    <value>投注报告页</value>
-  </data>
-  <data name="ResetForm" xml:space="preserve">
-    <value>重置表格</value>
-  </data>
-  <data name="Roll" xml:space="preserve">
-    <value>排</value>
-  </data>
-  <data name="Sat" xml:space="preserve">
-    <value>周六</value>
-  </data>
-  <data name="SatSun" xml:space="preserve">
-    <value>周六和周日</value>
-  </data>
-  <data name="Save" xml:space="preserve">
-    <value>保存资料</value>
-  </data>
-  <data name="SelectAMemberId" xml:space="preserve">
-    <value>选择会员 ID</value>
-  </data>
-  <data name="SelectCurrency" xml:space="preserve">
-    <value>选择货币</value>
-  </data>
-  <data name="SelectedCurrency" xml:space="preserve">
-    <value>所选货币</value>
-  </data>
-  <data name="SelectMemberId" xml:space="preserve">
-    <value>选择会员 ID</value>
-  </data>
-  <data name="Small" xml:space="preserve">
-    <value>小</value>
-  </data>
-  <data name="SmallIs" xml:space="preserve">
-    <value>小</value>
-  </data>
-  <data name="Straight" xml:space="preserve">
-    <value>直投</value>
-  </data>
-  <data name="Submit" xml:space="preserve">
-    <value>提交</value>
-  </data>
-  <data name="SubmitForm" xml:space="preserve">
-    <value>提交表格</value>
-  </data>
-  <data name="SubmitSearch" xml:space="preserve">
-    <value>提交搜索</value>
-  </data>
-  <data name="Sun" xml:space="preserve">
-    <value>周日</value>
-  </data>
-  <data name="TAmount" xml:space="preserve">
-    <value>总金额</value>
-  </data>
-  <data name="Time" xml:space="preserve">
-    <value>时间</value>
-  </data>
-  <data name="To" xml:space="preserve">
-    <value>到</value>
-  </data>
-  <data name="TotalBig" xml:space="preserve">
-    <value>总大 :</value>
-  </data>
-  <data name="TotalCost" xml:space="preserve">
-    <value>金额</value>
-  </data>
-  <data name="TotalMoneyAmount" xml:space="preserve">
-    <value>总金额($) :</value>
-  </data>
-  <data name="TotalSmall" xml:space="preserve">
-    <value>总小 :</value>
-  </data>
-  <data name="TotalVariations" xml:space="preserve">
-    <value>总变化</value>
-  </data>
-  <data name="UpdatePassword" xml:space="preserve">
-    <value>更新密码</value>
-  </data>
-  <data name="Username" xml:space="preserve">
-    <value>用户名</value>
-  </data>
-  <data name="Variations" xml:space="preserve">
-    <value>变化</value>
-  </data>
-  <data name="VariationsAmt" xml:space="preserve">
-    <value>总变化</value>
-  </data>
-  <data name="Wed" xml:space="preserve">
-    <value>周三</value>
-  </data>
-  <data name="WedSatSun" xml:space="preserve">
-    <value>周三、周六和周日</value>
+  <data name="SimpleFormDemo" xml:space="preserve">
+    <value>简单表单演示</value>
   </data>
   <data name="WelcomeMessage" xml:space="preserve">
-    <value>欢迎来到 Disney Playhouse！</value>
+    <value>欢迎来到Damien's 游乐场</value>
   </data>
 </root>

@@ -2,71 +2,26 @@
 
 <PageTitle>About The Demo</PageTitle>
 
-<MudText Typo="Typo.h5">Advantages of using SMS help</MudText>
-<MudList Clickable="false">
-    <MudListItem Text="Can be used in all mobile phones." Icon="@Icons.Material.Filled.RadioButtonChecked" />
-    <MudListItem Text="No software is needed to be installed into your mobile phone. Betting is done completely via SMS." Icon="@Icons.Material.Filled.RadioButtonChecked" />
-    <MudListItem Text="Can place your bets anywhere even without internet access." Icon="@Icons.Material.Filled.RadioButtonChecked" />
-    <MudListItem Text="All bets sent by SMS are immediately registered into our system when you received a confirmation SMS." Icon="@Icons.Material.Filled.RadioButtonChecked" />
-    <MudListItem Text="A record of your bets are stored in your phone." Icon="@Icons.Material.Filled.RadioButtonChecked" />
-</MudList>
+<MudText Typo="Typo.h4">About Damien's Playground</MudText>
+<hr />
+<br />
+<MudText Typo="Typo.body1">
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Cras sed felis eget velit aliquet sagittis. Integer feugiat scelerisque varius morbi enim nunc faucibus. Magna etiam tempor orci eu lobortis elementum. Id volutpat lacus laoreet non curabitur. Interdum velit laoreet id donec ultrices tincidunt arcu. Faucibus vitae aliquet nec ullamcorper. Vitae suscipit tellus mauris a diam maecenas. Facilisis leo vel fringilla est ullamcorper. Neque volutpat ac tincidunt vitae semper. Diam donec adipiscing tristique risus nec feugiat in fermentum posuere. Leo urna molestie at elementum. Hendrerit gravida rutrum quisque non tellus orci ac. Viverra vitae congue eu consequat.
+    <br />
+    <br />
+
+    Tristique risus nec feugiat in fermentum posuere urna nec tincidunt. Volutpat commodo sed egestas egestas fringilla phasellus faucibus. Sed felis eget velit aliquet sagittis id consectetur. Morbi tempus iaculis urna id volutpat lacus laoreet non curabitur. Ac placerat vestibulum lectus mauris ultrices. Urna nunc id cursus metus aliquam eleifend. Vestibulum lorem sed risus ultricies tristique nulla aliquet enim. Tincidunt ornare massa eget egestas. Dolor magna eget est lorem ipsum. Urna id volutpat lacus laoreet. Odio morbi quis commodo odio aenean. Dictum at tempor commodo ullamcorper a lacus vestibulum. Tempor commodo ullamcorper a lacus vestibulum. Orci ac auctor augue mauris augue. Sed adipiscing diam donec adipiscing tristique risus nec. Urna cursus eget nunc scelerisque. Nunc sed blandit libero volutpat sed cras ornare arcu dui. Etiam non quam lacus suspendisse faucibus interdum.
+    <br />
+    <br />
+
+    Tristique risus nec feugiat in fermentum posuere urna nec tincidunt. Volutpat commodo sed egestas egestas fringilla phasellus faucibus. Sed felis eget velit aliquet sagittis id consectetur. Morbi tempus iaculis urna id volutpat lacus laoreet non curabitur. Ac placerat vestibulum lectus mauris ultrices. Urna nunc id cursus metus aliquam eleifend. Vestibulum lorem sed risus ultricies tristique nulla aliquet enim. Tincidunt ornare massa eget egestas. Dolor magna eget est lorem ipsum. Urna id volutpat lacus laoreet. Odio morbi quis commodo odio aenean. Dictum at tempor commodo ullamcorper a lacus vestibulum. Tempor commodo ullamcorper a lacus vestibulum. Orci ac auctor augue mauris augue. Sed adipiscing diam donec adipiscing tristique risus nec. Urna cursus eget nunc scelerisque. Nunc sed blandit libero volutpat sed cras ornare arcu dui. Etiam non quam lacus suspendisse faucibus interdum.
+    <br />
+    <br />
+</MudText>
 <br />
 <hr />
-<MudText Typo="Typo.h5">Things to note when you bet via SMS</MudText>
-<MudList Clickable="false">
-    <MudListItem Text="The phone number that you use to send SMS must be registered in our site." Icon="@Icons.Material.Filled.RadioButtonChecked" />
-    <MudListItem Text="You can put up to three mobile phone numbers" Icon="@Icons.Material.Filled.RadioButtonChecked" />
-    <MudListItem Text="You can only bet using the ID of yourself or another person with your mobile phone number registered in their account." Icon="@Icons.Material.Filled.RadioButtonChecked" />
-</MudList>
 
 <MudAlert Severity="Severity.Error" Variant="Variant.Filled">
-    Try not to text more than 10 sets of numbers or 150 characters in one SMS betting.
-    If more than the recommended numbers are keyed in, the system may or may not accept the remaining numbers
-    and we will NOT be held responsible.
+    Please contact me to go through the demo together to ensure you understand the features and how to use them.
 </MudAlert>
 <br />
-<hr />
-<MudText Typo="Typo.h5">Example : </MudText>
-<MudTextField @ref="multilineReference" T="string" Label="Example SMS Message" Lines="2" Variant="Variant.Outlined" Text="@sampleText" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Api" OnAdornmentClick="@(() => multilineReference.SelectAsync())" />
-<MudList Clickable="false">
-    <MudListItem Text="The bets will only be confirmed if you've received a Reply SMS that states the total amount of bets." Icon="@Icons.Material.Filled.RadioButtonChecked" />
-    <MudListItem Text="Please be patient as you may only receive a Reply SMS after about 10 minutes." Icon="@Icons.Material.Filled.RadioButtonChecked" />
-    <MudListItem Text="SMS betting are closed at 6pm on Draw Day." Icon="@Icons.Material.Filled.RadioButtonChecked" />
-</MudList>
-<MudAlert Severity="Severity.Error" Variant="Variant.Filled">
-    If you do not receive a reply after you've submitted via SMS, please check your bets at "4D Bet History".
-</MudAlert>
-<br />
-<hr />
-<MudText Typo="Typo.h5">How To Bet</MudText>
-<MudTextField @ref="singleLineReference" T="string" Label="Betting Format" Variant="Variant.Outlined" Text="@sampleText2" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Api" OnAdornmentClick="@(() => singleLineReference.SelectAsync())" />
-<MudAlert Severity="Severity.Info" NoIcon="true" Class="my-2">
-    <b>Day:</b><br /><br />
-
-    1 = Wed, Sat & Sun<br />
-    2 = Sat & Sun<br />
-    3 = Wed<br />
-    6 = Sat<br />
-    7 = Sun
-</MudAlert>
-<MudAlert Severity="Severity.Success" NoIcon="true" Class="my-2">
-    <b>4D:</b><br /><br />
-
-    Normal Bet: 1234<br />
-    i Bet: 1234i<br />
-    Roll Bet: 1234r
-</MudAlert>
-<MudAlert Severity="Severity.Warning" NoIcon="true" Class="my-2">
-    1- = 1 Big<br />
-    -1 = 1 Small<br />
-    h- = 0.5 (Only for Big)<br />
-    q- = 0.25 (Only for Big)
-</MudAlert>
-<br />
-<hr />
-@code {
-    private MudTextField<string> multilineReference;
-    private MudTextField<string> singleLineReference;
-    string sampleText = "TEST1 3 1111i 111-111 2222i 111-111 3333i 111-111 4444i 111-111 5555i 111-111 6666i 111-111 7777i 111-111 8888i 111-111 9999i 111-111 1010i 111-111";
-    string sampleText2 = "ID<Space>Day<Space> 4D<Space>B-S";
-}

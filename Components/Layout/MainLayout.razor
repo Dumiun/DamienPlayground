@@ -1,6 +1,7 @@
 ﻿@using DamienPlayground.Components
 @inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
+@inject IStringLocalizer<Resource> localizer
 
 <MyMudThemeProvider SwitchTheme="@switchTheme" @rendermode="InteractiveServer"/>
 <MyMudProviders @rendermode="InteractiveServer"></MyMudProviders>
@@ -9,7 +10,7 @@
     <div class="sidebar mud-elevation-1">
         <div class="top-row mud-drawer-head">
             <img src="images/working.png" class="mb-1" style="width:50px; height:45px;">
-            <a class="navbar-brand" style="text-decoration: none;">Damien's Playground</a>
+            <a class="navbar-brand" style="text-decoration: none;">@localizer["DamienPlayground"]</a>
         </div>
         <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
         <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
@@ -49,7 +50,7 @@
                         <AntiforgeryToken />
                         <input type="hidden" name="ReturnUrl" value="@currentUrl" />
                         <MudTooltip Text="Logout">
-                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Logout" Color="Color.Error" ButtonType="ButtonType.Submit">Logout</MudButton>
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Logout" Color="Color.Error" ButtonType="ButtonType.Submit">@localizer["Logout"]</MudButton>
                         </MudTooltip>
                     </form>
                 </Authorized>
@@ -61,9 +62,9 @@
         </MudContainer>
 
         <MudAppBar Color="Color.Dark" Bottom="true" Fixed="true" Dense="true" Style="height:3%;">
-            Damien's Playground is developed by Damien Chin, Contact me @@ Damiennholic@gmail.com or +855 69 21 1218
+            @localizer["Footer1"]
             <MudSpacer></MudSpacer>
-            All rights reserved © Copyright 2024
+            @localizer["Footer2"]
         </MudAppBar>
     </main>
 </div>

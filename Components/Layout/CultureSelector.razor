@@ -2,13 +2,11 @@
 @inject IStringLocalizer<Resource> localizer
 
 
-<label class="h6 mt-2"><strong>@localizer["LanguageSelect"]</strong></label>
-<div class="m-3">
-    <select @bind="Culture" class="form-select" style="width:130%;">
+<MudText Typo="Typo.h6" Class="text-white mr-4"><strong>@localizer["LanguageSelect"]</strong></MudText>
+    <select @bind="Culture" class="form-select" style="width:200px; margin-right:20px;">
         <option value="en-US">English</option>
         <option value="zh-SG">中文</option>
     </select>
-</div>
 
 @code {
     protected override void OnInitialized()
