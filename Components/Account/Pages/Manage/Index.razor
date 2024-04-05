@@ -1,0 +1,110 @@
+﻿@page "/Account/Manage"
+
+@using System.ComponentModel.DataAnnotations
+@using DamienPlaygroundLibrary.Data
+@using Microsoft.AspNetCore.Identity
+@using DamienPlayground.Data
+
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject IdentityUserAccessor UserAccessor
+@inject IdentityRedirectManager RedirectManager
+@inject IMemberData memberData
+
+<PageTitle>Update Profile</PageTitle>
+
+<h3>Update Profile</h3>
+<StatusMessage />
+
+<div class="row">
+    <div class="col-md-6">
+        <EditForm Model="Input" FormName="profile" OnValidSubmit="OnValidSubmitAsync" method="post">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert" />
+            <div class="form-floating mb-3">
+                <input type="text" value="@username" class="form-control" placeholder="Please choose your username." disabled />
+                <label for="username" class="form-label">Username</label>
+            </div>
+            <hr />
+            <div class="row mb-3">
+                <div class="col-md-5">
+                    <MudText Typo="Typo.h6">Linked Phone Number : </MudText>
+                </div>
+                <div class="col-md-7 text-start">
+                    <MudText Typo="Typo.h6" Align="Align.Start">@phoneNumber</MudText>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3">
+                            <InputSelect @bind-Value="Input.CountryCode" class="form-select">
+                                <option value=""></option>
+                                <option value="+855">+855 - Cambodia</option>
+                                <option value="+65">+65 - Singapore</option>
+                            </InputSelect>
+                            <label for="phone-number" class="form-label">Country Code</label>
+                            <ValidationMessage For="() => Input.CountryCode" class="text-danger" />
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-floating mb-3">
+                            <InputText @bind-Value="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number." />
+                            <label for="phone-number" class="form-label">Phone number</label>
+                            <ValidationMessage For="() => Input.PhoneNumber" class="text-danger" />
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="w-100 btn btn-lg btn-success">Save</button>
+            </EditForm>
+        </div>
+    </div>
+
+    @code {
+    private ApplicationUser user = default!;
+    private string? username;
+    private string? phoneNumber;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await UserAccessor.GetRequiredUserAsync(HttpContext);
+        username = await UserManager.GetUserNameAsync(user);
+        phoneNumber = await UserManager.GetPhoneNumberAsync(user);
+
+    }
+
+    private async Task OnValidSubmitAsync()
+    {
+        var phoneNumberToBeSaved = Input.CountryCode + Input.PhoneNumber;
+
+        if (Input.PhoneNumber != phoneNumber)
+        {
+            var setPhoneResult = await UserManager.SetPhoneNumberAsync(user, phoneNumberToBeSaved);
+            if (!setPhoneResult.Succeeded)
+            {
+                RedirectManager.RedirectToCurrentPageWithStatus("Error: Failed to set phone number.", HttpContext);
+            }
+        }
+        await memberData.UpdateMemberPhoneNumber(phoneNumberToBeSaved, username);
+
+        await SignInManager.RefreshSignInAsync(user);
+        RedirectManager.RedirectToCurrentPageWithStatus("Your profile has been updated", HttpContext);
+    }
+
+    private sealed class InputModel
+    {
+        [Display(Name = "Country Code")]
+        public string? CountryCode { get; set; }
+
+        [Phone]
+        [Display(Name = "Phone number")]
+        [MaxLength(10, ErrorMessage = "Phone number must be at most 10 characters long.")]
+        [RegularExpression("^[0-9]*$", ErrorMessage = "Phone number can only contain numbers.")]
+        public string? PhoneNumber { get; set; }
+    }
+}

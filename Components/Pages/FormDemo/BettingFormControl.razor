@@ -1,0 +1,111 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using DamienPlayground.Data
+@using System.Text.RegularExpressions
+@using DamienPlaygroundLibrary.Data
+@inject IMemberData memberData
+
+    <MudGrid>
+        <MudItem xs="12" sm="9">
+            <MudPaper Class="pa-4">
+                <MudGrid>
+                    <MudItem xs="6">
+                        <MudAutocomplete T="string" Label="Select Member ID" @bind-Value="purchaseForId" SearchFunc="@Search"
+                                         ResetValueOnEmptyText="true"
+                                         CoerceText="true" CoerceValue="false" @onselect="FormIsValid"
+                                         AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" />
+                    </MudItem>
+                    <MudItem xs="6">
+                    <MudTextField @bind-Value="pageName" @onfocusout="FormIsValid" @oninput="FormIsValid" Label="Page Name" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.RequestPage" AdornmentColor="Color.Secondary" />
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudTextField @bind-Value="TotalBigAmount" Label="Total Big Amount" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.FormatBold" ReadOnly="true" AdornmentColor="Color.Warning" />
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudTextField @bind-Value="TotalSmallAmount" Label="Total Small Amount" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.StrikethroughS" ReadOnly="true" AdornmentColor="Color.Warning" />
+                    </MudItem>
+                    <MudItem xs="4">
+                    <MudTextField @bind-Value="TotalInvoiceAmount" Label="Total Invoice Amount" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney" ReadOnly="true" AdornmentColor="Color.Warning" />
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" DisableElevation="true" OnClick="ValidateForm">Validate</MudButton>
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudButton Variant="Variant.Filled" Color="Color.Secondary" FullWidth="true" DisableElevation="true" Class="mx-2" OnClick="ResetForm">Reset</MudButton>
+                    </MudItem>
+                <MudItem xs="4">
+                    <MudButton Variant="Variant.Filled" Color="Color.Success" FullWidth="true" DisableElevation="true" OnClick="SubmitCheck" Disabled="@SubmitDisabled">Submit</MudButton>
+                </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="3">
+            <MudPaper Class="pa-4 mud-height-full">
+                <BetFormLegend></BetFormLegend>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+
+
+
+@code {
+    private string currentUserId = "";
+    [CascadingParameter] public Task<AuthenticationState> AuthStateTask { get; set; }
+    private List<string> childIds = new List<string>();
+    [Parameter] public string purchaseForId { get; set; } = "";
+    [Parameter] public string pageName { get; set; } = "";
+    [Parameter] public bool SubmitDisabled { get; set; } = true;
+    [Parameter] public string TotalBigAmount { get; set; } = "";
+    [Parameter] public string TotalSmallAmount { get; set; } = "";
+    [Parameter] public string TotalInvoiceAmount { get; set; } = "";
+    [Parameter] public EventCallback OnValidateForm { get; set; }
+    [Parameter] public EventCallback<ValueTuple<string,string>> OnPageNameAndPurchaseForSet { get; set; }
+    [Parameter] public EventCallback OnSubmitCheck { get; set; }
+    [Parameter] public EventCallback OnResetForm { get; set; }
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        childIds = new List<string>();
+        currentUserId = AuthStateTask.Result.User.Identity.Name;
+        childIds = await memberData.GetChildIdsOfMember(currentUserId);
+        childIds.Insert(0, currentUserId);
+        purchaseForId = currentUserId;
+    }
+
+
+    private async Task<IEnumerable<string>> Search(string value)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+            return childIds;
+        return childIds.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task ValidateForm()
+    {
+        await OnValidateForm.InvokeAsync();
+    }
+
+    private async Task FormIsValid()
+    {
+        if (!string.IsNullOrEmpty(pageName) && !string.IsNullOrEmpty(purchaseForId))
+        {
+            await OnPageNameAndPurchaseForSet.InvokeAsync((pageName, purchaseForId));
+        }
+    }
+
+    private async Task SubmitCheck()
+    {
+        await OnSubmitCheck.InvokeAsync();
+    }
+
+    private async Task ResetForm()
+    {
+        await OnResetForm.InvokeAsync();
+    }
+}

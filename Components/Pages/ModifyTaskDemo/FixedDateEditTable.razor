@@ -1,0 +1,312 @@
+﻿@using DamienPlaygroundLibrary.Data
+@using DisneyPlayhouseAppLibrary.Models
+@inject IInvoiceData InvoiceData
+
+    <MudContainer MaxWidth="MaxWidth.ExtraLarge">
+        <MudPaper Elevation="0" Class="pa-6 mb-8">
+<MudTable Items="@Entries" Dense="true" Hover="true" CanCancelEdit="true" Class="mt-5" Striped="true" Bordered="true"
+          @bind-SelectedItem="selectedItem" SortLabel="Sort By" CommitEditTooltip="Commit Edit"
+          RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues" OnCommitEditClick="CommitChanges"
+          IsEditRowSwitchingBlocked="true" ApplyButtonPosition="@applyButtonPosition" EditButtonPosition="@editButtonPosition" EditTrigger="@editTrigger">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Editing Entry for Invoice : @EditInvoiceId</MudText>
+        <MudSpacer />
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowBack" Style="background-color: indianred; color: white; width: 200px; height: 50px;" OnClick="HideFormHandler">
+                        Go Back
+                    </MudButton>
+    </ToolBarContent>
+    <ColGroup>
+        @if (applyButtonPosition.DisplayApplyButtonAtStart() || (editButtonPosition.DisplayEditButtonAtStart() && editTrigger == TableEditTrigger.EditButton))
+        {
+            <col />
+        }
+        <col />
+        <col />
+        <col />
+        <col />
+        <col />
+        @if (applyButtonPosition.DisplayApplyButtonAtEnd() || (editButtonPosition.DisplayEditButtonAtEnd() && editTrigger == TableEditTrigger.EditButton))
+        {
+            <col />
+        }
+    </ColGroup>
+    <HeaderContent>
+        <MudTh Class="text-center">Day</MudTh>
+                <MudTh Class="text-center">Number</MudTh>
+                <MudTh Class="text-center">Big</MudTh>
+                <MudTh Class="text-center">Small</MudTh>
+                <MudTh Class="text-center">Roll</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+                <MudTd DataLabel="Day" Class="text-center">@context.Day</MudTd>
+                    <MudTd DataLabel="Number" Class="text-center">@context.Number</MudTd>
+                    <MudTd DataLabel="Big" Class="text-center">@context.Big</MudTd>
+                    <MudTd DataLabel="Small" Class="text-center">@context.Small</MudTd>
+                    <MudTd DataLabel="Roll" Class="text-center">@context.Roll</MudTd>
+        </RowTemplate>
+        <RowEditingTemplate>
+            <MudTd DataLabel="Day">
+                <MudTextField @bind-Value="@context.Day" @onfocusout="UpdateDayValid" @oninput="UpdateDayValid" Required />
+         </MudTd>
+            <MudTd DataLabel="Number">
+                <MudTextField @bind-Value="@context.Number" Required />
+         </MudTd>
+         <MudTd DataLabel="Big">
+             <MudTextField @bind-Value="@context.Big" Required />
+         </MudTd>
+         <MudTd DataLabel="Small">
+             <MudNumericField @bind-Value="@context.Small" Required Min="1" />
+         </MudTd>
+         <MudTd DataLabel="Roll">
+             <MudTextField @bind-Value="@context.Roll" Required />
+         </MudTd>
+     </RowEditingTemplate>
+     <PagerContent>
+         <MudTablePager />
+     </PagerContent>
+     <EditButtonContent Context="button">
+         <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Class="pa-0" OnClick="@button.ButtonAction" Disabled="@button.ButtonDisabled" />
+     </EditButtonContent>
+ </MudTable>
+</MudPaper>
+</MudContainer>
+
+
+ @code {
+    private Lib_FixedBetEntriesDataModel selectedItem = null;
+    private Lib_FixedBetEntriesDataModel elementBeforeEdit;
+    private TableApplyButtonPosition applyButtonPosition = TableApplyButtonPosition.End;
+    private TableEditButtonPosition editButtonPosition = TableEditButtonPosition.End;
+    private TableEditTrigger editTrigger = TableEditTrigger.RowClick;
+    [Parameter] public List<Lib_FixedBetEntriesDataModel> Entries { get; set; }
+    [Parameter] public string EditInvoiceId { get; set; }
+    private Lib_FixedBetInvoiceDataModel currentInvoiceDetails { get; set; } = new Lib_FixedBetInvoiceDataModel();
+    private double TotalBig;
+    private int TotalSmall;
+    private double TotalAmount;
+    [Parameter] public EventCallback hideEditForm { get; set; } 
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentInvoiceDetails = await InvoiceData.GetFixedDateInvoiceDetails(EditInvoiceId);
+        TotalBig = currentInvoiceDetails.TotalBig;
+        TotalSmall = currentInvoiceDetails.TotalSmall;
+        TotalAmount = currentInvoiceDetails.TotalAmount;
+    }
+
+    private void BackupItem(object element)
+    {
+        elementBeforeEdit = new()
+            {
+                Day = ((Lib_FixedBetEntriesDataModel)element).Day,
+                Number = ((Lib_FixedBetEntriesDataModel)element).Number,
+                Big = ((Lib_FixedBetEntriesDataModel)element).Big,
+                Small = ((Lib_FixedBetEntriesDataModel)element).Small,
+                Roll = ((Lib_FixedBetEntriesDataModel)element).Roll
+            };
+    }
+
+    private void ResetItemToOriginalValues(object element)
+    {
+        ((Lib_FixedBetEntriesDataModel)element).Day = elementBeforeEdit.Day;
+        ((Lib_FixedBetEntriesDataModel)element).Number = elementBeforeEdit.Number;
+        ((Lib_FixedBetEntriesDataModel)element).Big = elementBeforeEdit.Big;
+        ((Lib_FixedBetEntriesDataModel)element).Small = elementBeforeEdit.Small;
+        ((Lib_FixedBetEntriesDataModel)element).Roll = elementBeforeEdit.Roll;
+    }
+
+    private async void CommitChanges()
+    {
+        Lib_FixedBetEntriesDataModel entry = selectedItem;
+
+        //update the invoice
+        int NumberVariations = CalculateVariations(entry.Number, entry.Roll).Count;
+        List<DateTime> DrawDates = GetDrawDatesForEntry(entry.Day);
+        double BigAmount = entry.Big * NumberVariations * DrawDates.Count;
+        int SmallAmount = entry.Small * NumberVariations * DrawDates.Count;
+        double Amount = (BigAmount * 1.6) + (SmallAmount * 0.7);
+
+        int selectedNumberVariations = CalculateVariations(elementBeforeEdit.Number, elementBeforeEdit.Roll).Count;
+        List<DateTime> selectedDrawDates = GetDrawDatesForEntry(elementBeforeEdit.Day);
+        double selectedBigAmount = elementBeforeEdit.Big * selectedNumberVariations * selectedDrawDates.Count;
+        int selectedSmallAmount = elementBeforeEdit.Small * selectedNumberVariations * selectedDrawDates.Count;
+        double selectedAmount = (selectedBigAmount * 1.6) + (selectedSmallAmount * 0.7);
+
+        currentInvoiceDetails.TotalBig = (TotalBig - selectedBigAmount) + BigAmount;
+        currentInvoiceDetails.TotalSmall = (TotalSmall - selectedSmallAmount) + SmallAmount;
+        currentInvoiceDetails.TotalAmount = (TotalAmount - selectedAmount) + Amount;
+        currentInvoiceDetails.LastUpdatedOn = DateTime.Now;
+
+        try
+        {
+            await InvoiceData.UpdateFixedDateEntry(entry);
+            await InvoiceData.UpdateFixedDateInvoice(currentInvoiceDetails);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    //Calculation for Number Variations
+    private List<int> CalculateVariations(string number, string roll)
+    {
+        List<int> variations = new List<int>();
+        switch (roll)
+        {
+            case "":
+            case null:
+                variations.Add(int.TryParse(number, out int parsedNumber) ? parsedNumber : 0);
+
+                break;
+
+            case "F":
+                string numStrF = number;
+                int lastDigitF = int.Parse(number.Substring(3, 1));
+                numStrF = numStrF.Substring(0, 3);
+                PermuteWithNoDuplicates(variations, numStrF.ToCharArray(), 0, 2);
+                variations = variations.Select(v => int.Parse(v.ToString() + lastDigitF)).ToList();
+                break;
+
+            case "B":
+                string numStrB = number;
+                int firstDigitB = int.Parse(numStrB.Substring(0, 1));
+                numStrB = numStrB.Substring(1, 3);
+                PermuteWithNoDuplicates(variations, numStrB.ToCharArray(), 0, 2);
+                variations = variations.Select(v => int.Parse(firstDigitB.ToString() + v.ToString())).ToList();
+                break;
+
+            case "R":
+            case "I":
+                PermuteWithNoDuplicates(variations, number.ToCharArray(), 0, 3);
+                break;
+        }
+        return variations;
+    }
+    private void PermuteWithNoDuplicates(List<int> variations, char[] arr, int left, int right)
+    {
+        if (left == right)
+        {
+            int permutation = int.Parse(new string(arr));
+            if (!variations.Contains(permutation))
+            {
+                variations.Add(permutation);
+            }
+        }
+        else
+        {
+            for (int i = left; i <= right; i++)
+            {
+                Swap(ref arr[left], ref arr[i]);
+                PermuteWithNoDuplicates(variations, arr, left + 1, right);
+                Swap(ref arr[left], ref arr[i]); // backtrack
+            }
+        }
+    }
+    private void Swap(ref char a, ref char b)
+    {
+        char temp = a;
+        a = b;
+        b = temp;
+    }
+
+    //Calculation for Number Draw Dates
+    private List<DateTime> GetDrawDatesForEntry(int input)
+    {
+        List<DateTime> dates = new List<DateTime>();
+        DayOfWeek currentDay = DateTime.Now.DayOfWeek;
+        TimeSpan currentTime = DateTime.Now.TimeOfDay;
+
+        switch (input)
+        {
+            case 1:
+                if (currentDay == DayOfWeek.Monday || currentDay == DayOfWeek.Tuesday)
+                {
+                    dates.Add(GetNextWeekday(DayOfWeek.Wednesday));
+                    dates.Add(GetNextWeekday(DayOfWeek.Saturday));
+                    dates.Add(GetNextWeekday(DayOfWeek.Sunday));
+                }
+                else if (currentDay == DayOfWeek.Wednesday && currentTime < new TimeSpan(16, 30, 0))
+                {
+                    dates.Add(GetNextWeekday(DayOfWeek.Wednesday));
+                    dates.Add(GetNextWeekday(DayOfWeek.Saturday));
+                    dates.Add(GetNextWeekday(DayOfWeek.Sunday));
+                }
+                else if (currentDay == DayOfWeek.Wednesday && currentTime >= new TimeSpan(16, 30, 0))
+                {
+                    dates.Add(GetNextWeekday(DayOfWeek.Wednesday, 7));
+                    dates.Add(GetNextWeekday(DayOfWeek.Saturday));
+                    dates.Add(GetNextWeekday(DayOfWeek.Sunday));
+                }
+                else if (currentDay == DayOfWeek.Thursday || currentDay == DayOfWeek.Friday)
+                {
+                    dates.Add(GetNextWeekday(DayOfWeek.Wednesday));
+                    dates.Add(GetNextWeekday(DayOfWeek.Saturday));
+                    dates.Add(GetNextWeekday(DayOfWeek.Sunday));
+                }
+                else if (currentDay == DayOfWeek.Saturday && currentTime < new TimeSpan(16, 30, 0))
+                {
+                    dates.Add(GetNextWeekday(DayOfWeek.Saturday));
+                    dates.Add(GetNextWeekday(DayOfWeek.Wednesday));
+                    dates.Add(GetNextWeekday(DayOfWeek.Sunday));
+                }
+                else if (currentDay == DayOfWeek.Sunday && currentTime < new TimeSpan(16, 30, 0))
+                {
+                    dates.Add(GetNextWeekday(DayOfWeek.Sunday));
+                }
+                else if (currentDay == DayOfWeek.Sunday && currentTime >= new TimeSpan(16, 30, 0))
+                {
+                    dates.Add(GetNextWeekday(DayOfWeek.Wednesday));
+                    dates.Add(GetNextWeekday(DayOfWeek.Saturday));
+                    dates.Add(GetNextWeekday(DayOfWeek.Sunday, 7));
+                }
+                break;
+
+            case 2:
+                dates.Add(GetNextWeekday(DayOfWeek.Saturday));
+                dates.Add(GetNextWeekday(DayOfWeek.Sunday));
+                break;
+
+            case 3:
+                dates.Add(GetNextWeekday(DayOfWeek.Wednesday));
+                break;
+
+            case 6:
+                dates.Add(GetNextWeekday(DayOfWeek.Saturday));
+                break;
+
+            case 7:
+                dates.Add(GetNextWeekday(DayOfWeek.Sunday));
+                break;
+
+            default:
+                break;
+        }
+        return dates;
+    }
+    private static DateTime GetDayInCurrentWeek(DateTime currentDate, DayOfWeek targetDay)
+    {
+        int daysUntilTargetDay = ((int)targetDay - (int)currentDate.DayOfWeek + 7) % 7;
+        return currentDate.AddDays(daysUntilTargetDay);
+    }
+    private static DateTime GetNextWeekDay(DateTime currentDate, DayOfWeek targetDay)
+    {
+        int daysUntilTargetDay = ((int)targetDay - (int)currentDate.DayOfWeek + 7) % 7;
+        return currentDate.AddDays(daysUntilTargetDay + 7);
+    }
+    private static DateTime GetNextWeekday(DayOfWeek day, int offset = 0)
+    {
+        int daysUntil = ((int)day - (int)DateTime.Now.DayOfWeek + 7) % 7 + offset;
+        return DateTime.Now.Date.AddDays(daysUntil);
+    }
+
+    private async Task HideFormHandler()
+    {
+        await hideEditForm.InvokeAsync();
+    }
+
+    private async Task UpdateDayValid()
+    {
+        
+    }
+}

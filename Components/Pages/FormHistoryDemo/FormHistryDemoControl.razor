@@ -1,0 +1,78 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using System.Text.RegularExpressions
+@using DamienPlaygroundLibrary.Data
+@inject IMemberData memberData
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudGrid>
+            <MudItem xs="4">
+                <MudAutocomplete T="string" Label="Select Member ID" @bind-Value="SearchRecordsForId" SearchFunc="@Search"
+                                 ResetValueOnEmptyText="true"
+                                 CoerceText="true" CoerceValue="false"
+                                 AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" />
+            </MudItem>
+            <MudItem xs="3">
+                <MudDatePicker Label="Select From Date" Editable="true" @bind-Date="FromDate" />
+            </MudItem>
+            <MudItem xs="3">
+                <MudDatePicker Label="Select To Date" Editable="true" @bind-Date="ToDate" />
+            </MudItem>
+            <MudItem xs="2">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" Color="Color.Success" FullWidth="true" DisableElevation="true" Size="Size.Large" OnClick="SubmitSearch">Search History</MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+</MudGrid>
+
+
+@code {
+    private string currentUserId = "";
+    [CascadingParameter] public Task<AuthenticationState> AuthStateTask { get; set; }
+    private List<string> childIds = new List<string>();
+    private DateTime? FromDate;
+    private DateTime? ToDate;
+    private string SearchRecordsForId = "";
+    [Parameter] public EventCallback<ValueTuple<string, DateTime, DateTime>> GetBetHistorySubmitted { get; set; }
+    [Parameter] public EventCallback<ValueTuple<List<string>, DateTime, DateTime>> GetBetHistorySubmittedAllMembers { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //FromDate = first day of current month
+        FromDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        //ToDate = last day of current month
+        ToDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
+
+        childIds = new List<string>();
+        currentUserId = AuthStateTask.Result.User.Identity.Name;
+        childIds = await memberData.GetChildIdsOfMember(currentUserId);
+        childIds.Insert(0, currentUserId);
+        childIds.Insert(0, "All Members");
+        SearchRecordsForId = "All Members";
+    }
+
+    private async Task<IEnumerable<string>> Search(string value)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+            return childIds;
+        return childIds.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task SubmitSearch()
+    {
+        if (SearchRecordsForId == "All Members")
+        {
+            await GetBetHistorySubmittedAllMembers.InvokeAsync((childIds, FromDate.Value, ToDate.Value));
+        }
+
+        if (SearchRecordsForId != "All Members")
+        {
+            await GetBetHistorySubmitted.InvokeAsync((SearchRecordsForId, FromDate.Value, ToDate.Value));
+        }
+
+    }
+}

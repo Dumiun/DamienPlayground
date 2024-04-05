@@ -1,0 +1,33 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using DamienPlaygroundLibrary.Data
+@using System.Text.RegularExpressions
+@inject IMemberData memberData
+
+@page "/FormDemo/"
+@page "/FormDemo/{formType}"
+
+<PageTitle>Place Bets</PageTitle>
+
+@attribute [Authorize(Roles = "Player,Senior,Master,Agent")]
+
+<AuthorizeView>
+    <Authorized>
+        @if(formType == "Simple")
+        {
+            <SimpleForm></SimpleForm>
+        }
+        @if(formType == "Mass")
+        {
+            <MassForm></MassForm>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <RedirectUnAuthorizedUser></RedirectUnAuthorizedUser>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+    [Parameter] public string formType { get; set; } = "SimpleForm";
+    [CascadingParameter] public Task<AuthenticationState> AuthStateTask { get; set; }
+}

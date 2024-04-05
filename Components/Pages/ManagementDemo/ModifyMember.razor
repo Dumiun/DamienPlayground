@@ -1,0 +1,193 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using System.Text.RegularExpressions
+
+@using DamienPlayground.Components.Account
+@using DamienPlayground.Data
+@using DamienPlaygroundLibrary.Data
+@using DamienPlaygroundLibrary.Models
+@using Microsoft.AspNetCore.Identity
+
+@inject UserManager<ApplicationUser> UserManager
+@inject IUserStore<ApplicationUser> UserStore
+@inject SignInManager<ApplicationUser> SignInManager
+@inject IEmailSender<ApplicationUser> EmailSender
+@inject NavigationManager NavigationManager
+@inject IdentityRedirectManager RedirectManager
+@inject IMemberData memberData
+@inject IDialogService DialogService
+
+<EditForm Model="@Input" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <MudGrid>
+        <MudItem xs="12" sm="9">
+            <MudCard>
+                <MudCardContent>
+                    <MudGrid>
+                         <MudItem xs="6">
+                             <MudTextField ShrinkLabel Label="Login ID" HelperText="Max. 8 characters" Variant="Variant.Outlined" @onfocusout="CheckIfNameExist" @oninput="CheckIfNameExist"
+                                           @bind-Value="Input.MemberId" For="@(() => Input.MemberId)" Disabled="true" />
+                         </MudItem>
+                         <MudItem xs="6">
+
+                         </MudItem>
+                         <MudItem xs="6">
+                             <MudTextField ShrinkLabel Label="Existing Number" Variant="Variant.Outlined" @bind-Value="existingNumber" Disabled="true" />
+                         </MudItem>
+                         <MudItem xs="6">
+                             <MudGrid>
+                                 <MudItem xs="3">
+                                     <MudSelect ShrinkLabel T="string" Label="Code" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-value="Input.CountryCode">
+                                         <MudSelectItem Value="@("+65")" />
+                                         <MudSelectItem Value="@("+855")" />
+                                     </MudSelect>
+                                 </MudItem>
+                                 <MudItem xs="9">
+                                     <MudTextField ShrinkLabel Label="Phone number" HelperText="Leave Blank if no changes" Variant="Variant.Outlined"
+                                                   @bind-Value="Input.PhoneNumber" For="@(() => Input.PhoneNumber)" />
+                                 </MudItem>
+                             </MudGrid>
+                         </MudItem>
+                         <MudItem xs="6">
+                             <MudTextField ShrinkLabel T="string" Label="Password" HelperText="Choose a strong password" @bind-Value="Input.Password"
+                                           InputType="InputType.Password" @ref="pwField"
+                                           Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
+                                           RequiredError="Password is required!" />
+                         </MudItem>
+                         <MudItem xs="6">
+                             <MudTextField ShrinkLabel T="string"
+                                           Label="Confirm Password" HelperText="Repeat the password" InputType="InputType.Password" @bind-Value="Input.ConfirmPassword"
+                                           Validation="@(new Func<string, string>(PasswordMatch))" />
+                         </MudItem>
+                         <MudItem xs="6">
+                             <MudNumericField ShrinkLabel HideSpinButtons="true" @bind-Value="Input.CreditAmount" Label="Assigned Credit" Variant="Variant.Outlined" Min="0" Max="100000" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney" AdornmentColor="Color.Warning" />
+                         </MudItem>
+                     </MudGrid>
+                 </MudCardContent>
+                 <MudCardActions>
+                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" FullWidth="true" Color="Color.Error" Size="Size.Large" Class="m-5">Reset Form</MudButton>
+                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" FullWidth="true" Color="Color.Success" Size="Size.Large" Class="m-5">Register</MudButton>
+                 </MudCardActions>
+             </MudCard>
+         </MudItem>
+         <MudItem xs="12" sm="3">
+             <MudPaper Class="pa-4 mud-height-full">
+                 <MudText Typo="Typo.subtitle2">Validation Summary</MudText>
+                 <MudText Color="@Color.Error">
+                     <ValidationSummary />
+                 </MudText>
+             </MudPaper>
+         </MudItem>
+     </MudGrid>
+ </EditForm>
+
+ @code {
+    [SupplyParameterFromForm] private InputModel Input { get; set; } = new();
+    [Parameter] public string MemberId { get; set; }
+    MudTextField<string> pwField;
+    private string existingNumber = "";
+    private ILib_ExistingMemberModel existingMemberInfo = new Lib_ExistingMemberModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Input.MemberId = MemberId;
+        var user = await UserManager.FindByNameAsync(MemberId);
+        existingNumber = user.PhoneNumber;
+        existingMemberInfo = await memberData.GetMemberInfoById(MemberId);
+
+        Input.CreditAmount = existingMemberInfo.CreditAmount;
+
+    }
+
+    private async Task OnValidSubmit()
+    {
+        var phoneNumberToBeSaved = Input.CountryCode + Input.PhoneNumber;
+        var user = await UserManager.FindByNameAsync(Input.MemberId);
+
+        if(Input.Password != "")
+        {
+            var token = await UserManager.GeneratePasswordResetTokenAsync(user);
+            var result = await UserManager.ResetPasswordAsync(user, token, Input.Password);
+        }
+
+        existingMemberInfo.MemberId = Input.MemberId;
+        existingMemberInfo.CreditAmount = Input.CreditAmount;
+        existingMemberInfo.PhoneNumber = phoneNumberToBeSaved;
+
+        if(Input.PhoneNumber != "")
+        {
+            user.PhoneNumber = phoneNumberToBeSaved;
+        }
+        var UpdateResult = await UserManager.UpdateAsync(user);
+        await memberData.UpdateMember(existingMemberInfo);
+
+        NavigationManager.NavigateTo("/ManageMember/ViewAllMembers");
+
+    }
+
+    private IEnumerable<string> PasswordStrength(string pw)
+    {
+        if (pw.Length < 8)
+            yield return "Password must be at least of length 8";
+        if (!Regex.IsMatch(pw, @"[A-Z]"))
+            yield return "Password must contain at least one capital letter";
+        if (!Regex.IsMatch(pw, @"[a-z]"))
+            yield return "Password must contain at least one lowercase letter";
+        if (!Regex.IsMatch(pw, @"[0-9]"))
+            yield return "Password must contain at least one digit";
+    }
+
+    private string PasswordMatch(string arg)
+    {
+        if (pwField.Value != arg)
+            return "Passwords don't match";
+        return null;
+    }
+
+    private async Task CheckIfNameExist()
+    {
+        if (Input.MemberId != "")
+        {
+            var user = await UserManager.FindByNameAsync(Input.MemberId);
+
+            if (user != null)
+            {
+                Input.MemberId = "";
+                var options = new DialogOptions { CloseOnEscapeKey = true };
+                DialogService.Show<IdExistsDialog>("ID already Exists.", options);
+            }
+        }
+    }
+
+    private sealed class InputModel
+    {
+        [Required]
+        [DataType(DataType.Text)]
+        [Display(Name = "Member ID")]
+        public string MemberId { get; set; } = "";
+
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 8)]
+        [DataType(DataType.Password)]
+        [Display(Name = "Password")]
+        public string Password { get; set; } = "";
+
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm Password")]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        public string ConfirmPassword { get; set; } = "";
+
+        [Required]
+        [Display(Name = "Credit Amount")]
+        public double CreditAmount { get; set; } = 0.00;
+
+        public DateTime RegisteredDateTime { get; set; }
+
+        [Display(Name = "Country Code")]
+        public string? CountryCode { get; set; }
+
+        [Phone]
+        [Display(Name = "Phone number")]
+        [MaxLength(10, ErrorMessage = "Phone number must be at most 10 characters long.")]
+        [RegularExpression("^[0-9]*$", ErrorMessage = "Phone number can only contain numbers.")]
+        public string? PhoneNumber { get; set; }
+    }
+}

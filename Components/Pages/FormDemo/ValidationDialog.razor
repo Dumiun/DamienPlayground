@@ -1,0 +1,28 @@
+﻿@inject IDialogService DialogService
+
+<MudDialog>
+    <DialogContent>
+        @if(ValidationErrors.Count > 0)
+        {
+            <MudList Clickable="false" Dense="true" DisableGutters="true">
+                @foreach (var error in ValidationErrors)
+                {
+                    <MudListItem Text="@error" Icon="@Icons.Material.Filled.Warning" IconColor="Color.Secondary" />
+                }
+            </MudList>
+        }
+        else
+        {
+            <p>Form is ready for submission</p>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public List<string> ValidationErrors { get; set; }
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+}

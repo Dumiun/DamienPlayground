@@ -1,0 +1,35 @@
+﻿<MudPaper Width="250px" Class="py-3" Elevation="0">
+	<MudNavMenu>
+		<center>
+			<MudText Typo="Typo.subtitle1" Class="px-4">@DateTime.Now.ToLongDateString()</MudText>
+		</center>
+		<ClockComponent></ClockComponent>
+			<MudDivider Class="my-2" />
+		<MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+		<MudNavLink Href="aboutme" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person">About Me</MudNavLink>
+			<MudText Typo="Typo.body2" Class="px-4 mt-4">Components Showcase</MudText>
+			<MudDivider Class="my-2" />
+		<MudNavLink Href="AboutDemo" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Memory">1. About the Demo</MudNavLink>
+		<AuthorizeView>
+			<Authorized>
+					<MudNavLink Href="Account/Authentication" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AppRegistration" Disabled>2. Register </MudNavLink>
+					<MudNavLink Href="Account/Authentication" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Login" Disabled>3. Login </MudNavLink>
+				<MudNavLink Href="Account/Manage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">4. @context.User.Identity?.Name's Settings</MudNavLink>
+				<MudNavLink Href="FormDemo/Simple" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.GridView">5. Simple Form Demo</MudNavLink>
+				<MudNavLink Href="FormDemo/Mass" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.GridOn">6. Mass Form Demo</MudNavLink>
+				<MudNavLink Href="FormHistory" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.TableRows">7. Form History Demo</MudNavLink>
+				<MudNavLink Href="FixedDateBGTaskDemo" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.AddTask">8. Background Task Demo</MudNavLink>
+				<MudNavLink Href="ModifyTask" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.EditNote">9. Modify Task Demo</MudNavLink>
+				<MudNavLink Href="ManageMember" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ManageAccounts">10. Management Demo</MudNavLink>
+				</Authorized>
+				<NotAuthorized>
+					<MudNavLink Href="Account/Register" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AppRegistration">2. Register Account</MudNavLink>
+					<MudNavLink Href="Account/Login" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Login">3. Login Account</MudNavLink>
+				</NotAuthorized>
+			</AuthorizeView>
+			<MudText Typo="Typo.body2" Class="px-4 mt-4">App Implementation</MudText>
+			<MudDivider Class="my-2" />
+			<MudNavLink Href="asdas23232d" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dataset">Database Structure</MudNavLink>
+			<MudNavLink Href="asda12312sd" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Web">App Hosting</MudNavLink>
+		</MudNavMenu>
+	</MudPaper>

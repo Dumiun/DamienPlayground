@@ -1,0 +1,132 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using System.Text.RegularExpressions
+@using DamienPlaygroundLibrary.Data
+@using DamienPlaygroundLibrary.Models
+@inject IMemberData memberData
+@inject IInvoiceData invoiceData
+@inject IDialogService DialogService
+
+@page "/FormHistory"
+
+<style>
+    .mud-table-cell-custom-group {
+        font-weight: 500;
+    }
+
+    .mud-table-cell-custom-group-footer {
+        padding-bottom: 50px;
+        text-align: right;
+    }
+</style>
+
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge">
+     <MudPaper Elevation="2" Class="pa-4 ma-2 mb-4" Outlined="true">
+        <FormHistryDemoControl GetBetHistorySubmitted="GetBetHistorySubmitted" GetBetHistorySubmittedAllMembers="GetBetHistorySubmittedAllMembers"></FormHistryDemoControl>
+    </MudPaper>
+    @if(BetHistoryInvoices.Count > 0)
+    {
+        <MudPaper Elevation="2" Class="pa-4 ma-2 mb-4" Outlined="true">
+            <MudTable Hover="true" Breakpoint="Breakpoint.Sm" FixedHeader="true"
+                      Items="@BetHistoryInvoices"
+                      GroupBy="@_groupDefinition"
+                      GroupHeaderStyle="background-color:var(--mud-palette-background-grey)"
+                      GroupFooterClass="mb-4"
+                      Dense="true"
+                      @ref="_tableRef" Striped="true" Bordered="true">
+                <ColGroup>
+                    <col style="width: 60px;" />
+                    <col />
+                    <col />
+                    <col />
+                    <col />
+                    <col />
+                </ColGroup>
+                <HeaderContent>
+                    <MudTh Class="text-center">Purchased Date</MudTh>
+                    <MudTh Class="text-center">Purchased Time</MudTh>
+                    <MudTh Class="text-center">Invoice ID</MudTh>
+                    <MudTh Class="text-center">Member ID</MudTh>
+                    <MudTh Class="text-center">Currency</MudTh>
+                    <MudTh Class="text-center">Media Type</MudTh>
+                    <MudTh Class="text-center">Big</MudTh>
+                    <MudTh Class="text-center">Small</MudTh>
+                    <MudTh Class="text-center">Amount</MudTh>
+                    <MudTh Class="text-center">Page Name</MudTh>
+                    <MudTh Class="text-center">Invoice Details</MudTh>
+                </HeaderContent>
+                <GroupHeaderTemplate>
+                    <MudTh Class="mud-table-cell-custom-group" colspan="11">@($"{context.GroupName}: {context.Key}") </MudTh>
+                </GroupHeaderTemplate>
+                <RowTemplate>
+                    <MudTd DataLabel="Purchased Date" Class="text-center">@context.PurchasedDate.ToLongDateString()</MudTd>
+                        <MudTd DataLabel="Purchased Time" Class="text-center">@context.PurchasedDate.ToShortTimeString()</MudTd>
+                        <MudTd DataLabel="Invoice ID" Class="text-center">@context.InvoiceId</MudTd>
+                        <MudTd DataLabel="Member ID" Class="text-center">@context.PurchasedForId</MudTd>
+                        <MudTd DataLabel="Currency" Class="text-center">SGD</MudTd>
+                        <MudTd DataLabel="Media Type" Class="text-center">@context.MediaType</MudTd>
+                        <MudTd DataLabel="Big" Class="text-center">@context.TotalBig</MudTd>
+                        <MudTd DataLabel="Small" Class="text-center">@context.TotalSmall</MudTd>
+                        <MudTd DataLabel="Amount" Class="text-center">$@context.TotalAmount.ToString("0.00")</MudTd>
+                        <MudTd DataLabel="Page Name" Class="text-center">@context.PageName</MudTd>
+                        <MudTd DataLabel="Invoice Details" Class="text-center"><MudIconButton Icon="@Icons.Material.Filled.AddBox" Color="Color.Success" Size="Size.Small" OnClick="() => ViewSelectedInvoice(context)"></MudIconButton></MudTd>
+                    </RowTemplate>
+                    <GroupFooterTemplate>
+                        <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer" colspan="6">Total : </MudTh>
+                        <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer text-center">@context.Items.Sum((e) => e.TotalBig)</MudTh>
+                        <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer text-center">@context.Items.Sum((e) => e.TotalSmall)</MudTh>
+                        <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer text-center">$@context.Items.Sum((e) => e.TotalAmount).ToString("0.00")</MudTh>
+                        <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer text-center" colspan="2"></MudTh>
+                    </GroupFooterTemplate>
+                </MudTable>
+            </MudPaper>
+    }
+    @if(BetHistoryInvoices.Count == 0)
+    {
+        <MudPaper Elevation="2" Class="pa-4 ma-2 mb-4" Outlined="true">
+            <MudAlert Severity="Severity.Info">No Bet History Found</MudAlert>
+        </MudPaper>
+    }
+</MudContainer>
+
+@code{
+    private List<Lib_InvoiceLevel1DataModel> BetHistoryInvoices { get; set; } = new List<Lib_InvoiceLevel1DataModel>();
+    private string searchString = "";
+    private string currentUserId = "";
+    [CascadingParameter] public Task<AuthenticationState> AuthStateTask { get; set; }
+    private MudTable<Lib_InvoiceLevel1DataModel> _tableRef;
+    private TableGroupDefinition<Lib_InvoiceLevel1DataModel> _groupDefinition = new()
+        {
+            GroupName = "Invoices For Member ID ",
+            Indentation = false,
+            Expandable = true,
+            IsInitiallyExpanded = true,
+            Selector = (e) => e.PurchasedForId
+        };
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUserId = AuthStateTask.Result.User.Identity.Name;
+    }
+
+    private async Task GetBetHistorySubmitted(ValueTuple<string, DateTime, DateTime> searchCriteria)
+    {
+        BetHistoryInvoices = await invoiceData.GetBetHistoryForUserWithinDateRange(searchCriteria.Item1, searchCriteria.Item2, searchCriteria.Item3);
+    }
+
+    private async Task GetBetHistorySubmittedAllMembers(ValueTuple<List<string>, DateTime, DateTime> searchCriteria)
+    {
+        BetHistoryInvoices = await invoiceData.GetBetHistoryForAllUsersWithinDateRange(searchCriteria.Item1, searchCriteria.Item2, searchCriteria.Item3);
+    }
+
+    private async Task ViewSelectedInvoice(Lib_InvoiceLevel1DataModel data)
+    {
+        List<Lib_InvoiceLevel3DataModel> level3InvoiceData = await invoiceData.GetBetHistoryInvoiceDetails(data.InvoiceId);
+
+        var parameters = new DialogParameters<BetHistoryInvoiceDialog>();
+        parameters.Add(x => x.Level1InvoiceData, data);
+        parameters.Add(x => x.Entries, level3InvoiceData);
+        var options = new DialogOptions() { MaxWidth = MaxWidth.ExtraLarge, FullWidth = true };
+        var dialog = DialogService.Show<BetHistoryInvoiceDialog>("Invoice Details", parameters, options);
+    }
+}

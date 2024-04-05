@@ -1,0 +1,172 @@
+﻿@page "/Account/Register"
+
+@using System.ComponentModel.DataAnnotations
+@using System.Text
+@using System.Text.Encodings.Web
+@using DamienPlayground.Data
+@using DamienPlaygroundLibrary.Data
+@using DamienPlaygroundLibrary.Models
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.WebUtilities
+
+@inject UserManager<ApplicationUser> UserManager
+@inject IUserStore<ApplicationUser> UserStore
+@inject SignInManager<ApplicationUser> SignInManager
+@inject IEmailSender<ApplicationUser> EmailSender
+@inject ILogger<Register> Logger
+@inject NavigationManager NavigationManager
+@inject IdentityRedirectManager RedirectManager
+@inject IMemberData memberData
+
+<PageTitle>Register Account</PageTitle>
+
+<div class="row mt-6">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <h1 class="text-dark display-4">Authentication Demo</h1>
+        <div class="alert alert-warning" role="alert">
+            Please refer to the <a href="">"About The Demo"</a> page for more information on the purpose of this page."
+        </div>
+        <hr />
+        </div>
+        </div>
+
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+    <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
+        <DataAnnotationsValidator />
+    <center>
+        <br />
+        <h2>Are ready to explore? Create an account now!</h2>
+        <br />
+
+        <div class="form-floating mb-3 w-50">
+            <InputText @bind-Value="Input.MemberId" class="form-control" autocomplete="username" aria-required="true" />
+            <label for="memberId">Member ID</label>
+            <ValidationMessage For="() => Input.MemberId" class="text-danger" />
+        </div>
+        <div class="form-floating mb-3 w-50">
+            <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+            <label for="password">Password</label>
+            <ValidationMessage For="() => Input.Password" class="text-danger" />
+        </div>
+        <div class="form-floating mb-3 w-50">
+            <InputText type="password" @bind-Value="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+            <label for="confirm-password">Confirm Password</label>
+            <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
+        </div>
+        <div class="form-floating mb-3 w-50">
+            <InputSelect @bind-Value="Input.Role" class="form-select">
+                <option value="Player">Player</option>
+                <option value="Master">Master</option>
+            </InputSelect>
+            <label for="select-role">Select Role</label>
+            <ValidationMessage For="() => Input.Role" class="text-danger" />
+        </div>
+        <div class="form-floating mb-3 w-50">
+            <InputNumber type="number" @bind-Value="Input.CreditAmount" class="form-control" />
+            <label>Credit Amount</label>
+        </div>
+        <br />
+        <button type="submit" class=" w-50 btn btn-lg btn-dark">Register</button>
+        </center>
+    </EditForm>
+    </div>
+    <div class="col-md-1"></div>
+</div>
+
+@code {
+    private IEnumerable<IdentityError>? identityErrors;
+    private ILib_CreateNewMemberModel newMemberInfo = new Lib_CreateNewMemberModel();
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = new();
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+    private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
+
+    public async Task RegisterUser(EditContext editContext)
+    {
+        var user = CreateUser();
+        Input.RegisteredDateTime = DateTime.Now;
+        await UserStore.SetUserNameAsync(user, Input.MemberId, CancellationToken.None);
+
+        var result = await UserManager.CreateAsync(user, Input.Password);
+        await UserManager.AddToRoleAsync(user, Input.Role);
+
+        newMemberInfo.MemberId = Input.MemberId;
+        newMemberInfo.Role = Input.Role;
+        newMemberInfo.ParentMemberId = "Root";
+        newMemberInfo.CreditAmount = Input.CreditAmount;
+        newMemberInfo.PhoneNumber = "";
+        newMemberInfo.RegisteredDateTime = Input.RegisteredDateTime;
+
+        await memberData.CreateNewMember(newMemberInfo);
+
+        if (!result.Succeeded)
+        {
+            identityErrors = result.Errors;
+            return;
+        }
+
+        RedirectManager.RedirectTo(ReturnUrl);
+    }
+
+    private ApplicationUser CreateUser()
+    {
+        try
+        {
+            return Activator.CreateInstance<ApplicationUser>();
+        }
+        catch
+        {
+            throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
+                $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor.");
+        }
+    }
+
+    private IUserEmailStore<ApplicationUser> GetEmailStore()
+    {
+        if (!UserManager.SupportsUserEmail)
+        {
+            throw new NotSupportedException("The default UI requires a user store with email support.");
+        }
+        return (IUserEmailStore<ApplicationUser>)UserStore;
+    }
+
+
+    private sealed class InputModel
+    {
+        [Required]
+        [DataType(DataType.Text)]
+        [Display(Name = "Member ID")]
+        public string MemberId { get; set; } = "";
+
+        [Required]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(Name = "Password")]
+        public string Password { get; set; } = "";
+
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm Password")]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        public string ConfirmPassword { get; set; } = "";
+
+        [Required]
+        [DataType(DataType.Text)]
+        [Display(Name = "Role")]
+        public string Role { get; set; } = "";
+
+        [DataType(DataType.Text)]
+        [Display(Name = "Parent Member ID")]
+        public string ParentMemberId { get; set; } = "Root";
+
+        [Required]
+        [Display(Name = "Credit Amount")]
+        public double CreditAmount { get; set; } = 0.00;
+
+        public DateTime RegisteredDateTime { get; set; } = DateTime.Now;
+    }
+}

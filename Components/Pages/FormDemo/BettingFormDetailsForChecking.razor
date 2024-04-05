@@ -1,0 +1,71 @@
+﻿@using DamienPlaygroundLibrary.Models
+
+<MudSimpleTable Style="overflow-x: auto;" Striped="true" Bordered="true" Hover="true" Dense="true" >
+    <thead>
+        <tr>
+            @foreach (var h in headings)
+            {
+                <th class="text-center">@h</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < Entries.Count; i++)
+        {
+            @if (!string.IsNullOrEmpty(Entries[i].Number))
+            {
+                @if (Entries[i].Number.Length == 4)
+                {
+                    <tr>
+                        <td class="text-center">@ListIndex</td>
+                        <td class="text-center"><b>@Entries[i].Day</b></td>
+                        @if (Entries[i].DrawDates.Count == 3)
+                        {
+                            <td class="text-center">@Entries[i].DrawDates[0].ToLongDateString()</td>
+                            <td class="text-center">@Entries[i].DrawDates[1].ToLongDateString()</td>
+                            <td class="text-center">@Entries[i].DrawDates[2].ToLongDateString()</td>
+                        }
+                        else if (Entries[i].DrawDates.Count == 2)
+                        {
+                            <td class="text-center">@Entries[i].DrawDates[0].ToLongDateString()</td>
+                            <td class="text-center">@Entries[i].DrawDates[1].ToLongDateString()</td>
+                            <td class="text-center">N/A Dates</td>
+                        }
+                        else if (Entries[i].DrawDates.Count == 1)
+                        {
+                            <td class="text-center">@Entries[i].DrawDates[0].ToLongDateString()</td>
+                            <td class="text-center">N/A Dates</td>
+                            <td class="text-center">N/A Dates</td>
+                        }
+                        <td class="text-center"><b>@Entries[i].Number</b></td>
+                        <td class="text-center">@Entries[i].NumberVariations.Count</td>
+                        <td class="text-center"><b>@Entries[i].Big</b></td>
+                        <td class="text-center">@Entries[i].ActualBig</td>
+                        <td class="text-center"><b>@Entries[i].Small</b></td>
+                        <td class="text-center">@Entries[i].ActualSmall</td>
+                        <td class="text-center"><b>@Entries[i].Roll</b></td>
+                        <td class="text-center">$@Entries[i].TotalCostForEntry.ToString("0.00")</td>
+                    </tr>
+                    ListIndex++;
+                }
+            }
+        }
+        <tr>
+            <td colspan="7"></td>
+            <td class="text-center"><MudText Typo="Typo.subtitle1"><b>Actual Big :</b></MudText></td>
+            <td class="bg-success text-light text-center">@TotalBigForCheck</td>
+            <td class="text-center"><MudText Typo="Typo.subtitle1"><b>Actual Small :</b></MudText></td>
+            <td class="bg-success text-light text-center">@TotalSmallForCheck</td>
+            <td class="text-center"><MudText Typo="Typo.subtitle1"><b>Total Cost :</b></MudText></td>
+            <td class="bg-success text-light text-center">$@TotalCostForCheck</td>
+        </tr>
+    </tbody>
+</MudSimpleTable>
+@code {
+    string[] headings = { "#", "Day", "1st Draw Date", "2nd Draw Date", "3rd Draw Date", "Number", "Variations", "Big", "Actual Big", "Small", "Actual Small", "Roll", "Total Cost" };
+    [Parameter] public List<Lib_BettingFormIndividualRowEntry> Entries { get; set; }
+    [Parameter] public string TotalCostForCheck { get; set; }
+    [Parameter] public string TotalSmallForCheck { get; set; }
+    [Parameter] public string TotalBigForCheck { get; set; }
+    private int ListIndex = 1;
+}

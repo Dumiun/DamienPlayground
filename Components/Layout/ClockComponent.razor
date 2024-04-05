@@ -1,0 +1,23 @@
+﻿<MudText Align="Align.Center" Typo="Typo.body1">@theTime</MudText>
+
+    @code {
+    string theTime;
+    Timer aTimer;
+
+    protected override void OnInitialized()
+    {
+        aTimer = new Timer(Tick, null, 0, 1000);
+    }
+
+    private void Tick(object _)
+    {
+        TimeZoneInfo SGTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Singapore Standard Time");
+        DateTime singaporeTime = TimeZoneInfo.ConvertTime(DateTime.Now, SGTimeZone);
+        theTime = singaporeTime.ToLongTimeString();
+        InvokeAsync(StateHasChanged);
+    }
+    public void Dispose()
+    {
+        aTimer?.Dispose();
+    }
+}

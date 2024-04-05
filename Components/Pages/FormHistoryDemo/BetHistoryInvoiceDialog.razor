@@ -1,0 +1,74 @@
+﻿@using DamienPlaygroundLibrary.Models
+
+<MudDialog>
+    <DialogContent>
+        <MudSimpleTable Style="overflow-x: auto;" Striped="true" Bordered="true" Hover="true" Dense="true">
+            <thead>
+                <tr>
+                    @foreach (var h in headings)
+                    {
+                        <th class="text-center">@h</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Entries.Count; i++)
+                {
+                            <tr>
+                                <td class="text-center">@ListIndex</td>
+                                <td class="text-center"><b>@Entries[i].Day</b></td>
+                                @if (Entries[i].DrawDate3 != new DateTime(1, 1, 1))
+                                {
+                                    <td class="text-center">@Entries[i].DrawDate1.ToLongDateString()</td>
+                                    <td class="text-center">@Entries[i].DrawDate2.ToLongDateString()</td>
+                                    <td class="text-center">@Entries[i].DrawDate3.ToLongDateString()</td>
+                                }
+                                else if (Entries[i].DrawDate3 == new DateTime(1, 1, 1) && Entries[i].DrawDate2 != new DateTime(1, 1, 1))
+                                {
+                                    <td class="text-center">@Entries[i].DrawDate1.ToLongDateString()</td>
+                                    <td class="text-center">@Entries[i].DrawDate2.ToLongDateString()</td>
+                                    <td class="text-center">N/A Date To Show</td>
+                                }
+                                else if (Entries[i].DrawDate3 == new DateTime(1, 1, 1) && Entries[i].DrawDate2 == new DateTime(1, 1, 1))
+                                {
+                                    <td class="text-center">@Entries[i].DrawDate1.ToLongDateString()</td>
+                                    <td class="text-center">N/A Date To Show</td>
+                                    <td class="text-center">N/A Date To Show</td>
+                                }
+                                <td class="text-center"><b>@Entries[i].Number</b></td>
+                                <td class="text-center">@Entries[i].NoOfVariations</td>
+                                <td class="text-center"><b>@Entries[i].Big</b></td>
+                                <td class="text-center">@Entries[i].ActualBig</td>
+                                <td class="text-center"><b>@Entries[i].Small</b></td>
+                                <td class="text-center">@Entries[i].ActualSmall</td>
+                                <td class="text-center"><b>@Entries[i].Roll</b></td>
+                                <td class="text-center">$@Entries[i].TotalCostForEntry.ToString("0.00")</td>
+                            </tr>
+                            ListIndex++;
+                }
+                <tr>
+                    <td colspan="7"></td>
+                    <td class="text-center"><MudText Typo="Typo.subtitle1"><b>Total Big :</b></MudText></td>
+                    <td class="text-center">@Level1InvoiceData.TotalBig</td>
+                    <td class="text-center"><MudText Typo="Typo.subtitle1"><b>Total Small :</b></MudText></td>
+                    <td class="text-center">@Level1InvoiceData.TotalSmall</td>
+                    <td class="text-center"><MudText Typo="Typo.subtitle1"><b>Total Cost :</b></MudText></td>
+                    <td class="text-center">$@Level1InvoiceData.TotalAmount</td>
+                </tr>
+            </tbody>
+        </MudSimpleTable>
+        </DialogContent>
+        <DialogActions>
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Submit">OK</MudButton>
+        </DialogActions>
+    </MudDialog>
+    @code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    private int ListIndex = 1;
+    string[] headings = { "#", "Day", "1st Draw Date", "2nd Draw Date", "3rd Draw Date", "Number", "Variations", "Big", "Actual Big", "Small", "Actual Small", "Roll", "Total Cost" };
+
+    [Parameter] public Lib_InvoiceLevel1DataModel Level1InvoiceData { get; set; } 
+    [Parameter] public List<Lib_InvoiceLevel3DataModel> Entries { get; set; }
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+}

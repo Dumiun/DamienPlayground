@@ -1,0 +1,37 @@
+﻿@page "/ManageMember"
+@page "/ManageMember/{Option}"
+@page "/ManageMember/ModifyMember/{MemberId}/{Option}"
+@page "/ManageMember/AddNewMember/{MemberId}/{Option}"
+@inject NavigationManager NavigationManager
+
+<PageTitle>Manage Member</PageTitle>
+
+@attribute [Authorize(Roles = "Player,Master,Agent,Senior")]
+
+<AuthorizeView>
+    <MudGrid>
+        <MudItem xs="2">
+            <UserTree></UserTree>
+        </MudItem>
+        <MudItem xs="10">
+            @if(Option == "ViewAllMembers")
+            {
+                <ViewAllMembers></ViewAllMembers>
+            }
+            @if (Option == "ModifyMember")
+            {
+                <ModifyMember MemberId="@MemberId"></ModifyMember>
+            }
+            @if (Option == "AddNewMember")
+            {
+                <AddNewMember AssignedParentId="@MemberId"></AddNewMember>
+            }
+        </MudItem>
+    </MudGrid>
+</AuthorizeView>
+
+@code {
+    [Parameter] public string MemberId { get; set; }
+    [Parameter] public string Option { get; set; } 
+
+}

@@ -1,0 +1,57 @@
+﻿@using DisneyPlayhouseApp.Data
+@inject NavigationManager NavigationManager
+
+@if (RootNode != null)
+{
+    <ul style="white-space: nowrap;">
+        <li style="margin-left: @(RootNode.Level * 10)px;">
+            @if (!RootNode.ChildrenCount.Equals(0))
+            {
+                <MudToggleIconButton Toggled="@isToggleOpen"
+                                     Icon="@Icons.Material.Filled.KeyboardArrowRight" Color="@Color.Error"
+                                     ToggledIcon="@Icons.Material.Filled.KeyboardArrowDown" ToggledColor="@Color.Success" ToggledTitle="On"
+                                     ToggledChanged="OnToggledChanged" />
+            }
+            else
+            {
+                <MudToggleIconButton Icon="@Icons.Material.Filled.KeyboardArrowRight" Color="@Color.Error" Disabled=true />
+            }
+            <MudLink OnClick="@(() => ModifyUser(RootNode))" Style="font-size:smaller;">
+                <MudIcon Icon="@Icons.Material.Filled.PersonOutline" />
+                @RootNode.ParentName [@RootNode.RoleName] (@RootNode.ChildrenCount)
+            </MudLink>
+            <MudIconButton  OnClick="@(() => AddMember(RootNode))" Icon="@Icons.Material.Filled.Add" Color="Color.Success" />
+            @if (isToggleOpen && RootNode.ChildrenCount > 0)
+            {
+                @foreach (var child in RootNode.Children)
+                {
+                    <TreeElements RootNode="@child" />
+                }
+            }
+        </li>
+    </ul>
+}
+
+
+@code {
+    [Parameter]
+    public UserNode RootNode { get; set; }
+
+    public string modify = "ModifyMember";
+    public string addnew = "AddNewMember";
+
+    public bool isToggleOpen { get; set; } = true;
+    public bool noChildToggle { get; set; } = false;
+    public async Task OnToggledChanged(bool toggled)
+    {
+        isToggleOpen = toggled;
+    }
+    private async Task ModifyUser(UserNode Item)
+    {
+        NavigationManager.NavigateTo($"/ManageMember/ModifyMember/{Item.ParentName}/{modify}", forceLoad: true);
+    }
+    private async Task AddMember(UserNode Item)
+    {
+        NavigationManager.NavigateTo($"/ManageMember/AddNewMember/{Item.ParentName}/{addnew}", forceLoad: true);
+    }
+}

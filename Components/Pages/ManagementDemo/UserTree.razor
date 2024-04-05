@@ -1,0 +1,51 @@
+﻿
+@using DamienPlayground.Data
+@using DamienPlaygroundLibrary.Data
+@using DamienPlaygroundLibrary.Models
+@using DisneyPlayhouseApp.Data
+@using Microsoft.AspNetCore.Identity
+@inject IMemberData memberData
+@inject UserManager<ApplicationUser> UserManager
+@inject NavigationManager Navigation
+
+<MudPaper Style="display: flex; justify-content: space-between; overflow-x: auto;" Elevation="0">
+    @if (_render)
+    {
+        <MudPaper>
+            <div style="overflow-x: auto; overflow-y: scroll; height: 85vh; width: 300px;" class="alert alert-secondary">
+                <center>
+                    <MudText Typo="Typo.h6"><u>Member List</u></MudText>
+                </center>
+                <TreeElements RootNode="userTree"></TreeElements>
+            </div>
+        </MudPaper>
+    }
+</MudPaper>
+
+@code {
+    private bool _render = false;
+    private List<ILib_ListOfChildIdModel> names = new List<ILib_ListOfChildIdModel>();
+    private string? currentUserId = "";
+    [CascadingParameter] public Task<AuthenticationState> AuthStateTask { get; set; }
+    private List<ILib_ListOfChildIdModel> children = new List<ILib_ListOfChildIdModel>();
+    UserNode userTree = new UserNode("");
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUserId = AuthStateTask.Result.User.Identity.Name;
+        UserManager userManager = new UserManager(memberData, UserManager);
+        string parentId = currentUserId;
+        names = await memberData.GetListOfDirectChildId(currentUserId);
+        userTree = await userManager.GetUserTree(parentId);
+        userTree.ChildrenCount = names.Count();
+        var user = await UserManager.FindByNameAsync(currentUserId);
+        if (user is not null)
+        {
+            var userRole = await UserManager.GetRolesAsync(user);
+            userTree.RoleName = userRole.Count > 0 ? userRole[0] : " ";
+        }
+        _render = true;
+    }
+
+
+}

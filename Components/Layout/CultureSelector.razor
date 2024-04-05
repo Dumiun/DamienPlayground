@@ -1,0 +1,38 @@
+﻿@inject NavigationManager Navigation
+@inject IStringLocalizer<Resource> localizer
+
+
+<label class="h6 mt-2"><strong>@localizer["LanguageSelect"]</strong></label>
+<div class="m-3">
+    <select @bind="Culture" class="form-select" style="width:130%;">
+        <option value="en-US">English</option>
+        <option value="zh-SG">中文</option>
+    </select>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        Culture = CultureInfo.CurrentCulture;
+    }
+
+    private CultureInfo Culture
+    {
+        get
+        {
+            return CultureInfo.CurrentCulture;
+        }
+        set
+        {
+            if (CultureInfo.CurrentCulture != value)
+            {
+                var uri = new Uri(Navigation.Uri).GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+                var cultureEscaped = Uri.EscapeDataString(value.Name);
+                var uriEscaped = Uri.EscapeDataString(uri);
+
+                Navigation.NavigateTo($"Culture/Set?culture={cultureEscaped}&redirectUri={uriEscaped}", forceLoad: true);
+            }
+
+        }
+    }
+}

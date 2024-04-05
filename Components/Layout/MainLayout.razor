@@ -1,0 +1,97 @@
+﻿@using DamienPlayground.Components
+@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+
+<MyMudThemeProvider SwitchTheme="@switchTheme" @rendermode="InteractiveServer"/>
+<MyMudProviders @rendermode="InteractiveServer"></MyMudProviders>
+
+<div class="page mud-layout">
+    <div class="sidebar mud-elevation-1">
+        <div class="top-row mud-drawer-head">
+            <img src="images/working.png" class="mb-1" style="width:50px; height:45px;">
+            <a class="navbar-brand" style="text-decoration: none;">Damien's Playground</a>
+        </div>
+        <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+        <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+            <NavMenu />
+        </div>
+    </div>
+    <main>
+        <div class="top-row px-4">
+            <CultureSelector></CultureSelector>
+            <AuthorizeView>
+                <NotAuthorized>
+                    @if (switchTheme)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.NightsStay" Color="Color.Warning" Class="mr-4 " />
+                    }
+                    @if (!switchTheme)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.WbSunny" Color="Color.Warning" Class="mr-4" />
+                    }
+                    <MudTooltip Text="Toggle Light/Dark Mode">
+                        <MudSwitch @bind-Value="@switchTheme" Color="Color.Warning" UnCheckedColor="Color.Warning" />
+                    </MudTooltip>
+                </NotAuthorized>
+                <Authorized>
+                    @if (switchTheme)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.NightsStay" Color="Color.Warning" Class="mr-4 " />
+                    }
+                    @if (!switchTheme)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.WbSunny" Color="Color.Warning" Class="mr-4" />
+                    }
+                    <MudTooltip Text="Toggle Light/Dark Mode">
+                        <MudSwitch @bind-Value="@switchTheme" Color="Color.Warning" UnCheckedColor="Color.Warning" />
+                    </MudTooltip>
+                    <form action="Account/Logout" method="post">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                        <MudTooltip Text="Logout">
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Logout" Color="Color.Error" ButtonType="ButtonType.Submit">Logout</MudButton>
+                        </MudTooltip>
+                    </form>
+                </Authorized>
+            </AuthorizeView>
+        </div>
+
+        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="my-2 pt-2">
+            @Body
+        </MudContainer>
+
+        <MudAppBar Color="Color.Dark" Bottom="true" Fixed="true" Dense="true" Style="height:3%;">
+            Damien's Playground is developed by Damien Chin, Contact me @@ Damiennholic@gmail.com or +855 69 21 1218
+            <MudSpacer></MudSpacer>
+            All rights reserved © Copyright 2024
+        </MudAppBar>
+    </main>
+</div>
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+
+@code {
+    private bool switchTheme { get; set; } = false;
+    private string? currentUrl;
+
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}

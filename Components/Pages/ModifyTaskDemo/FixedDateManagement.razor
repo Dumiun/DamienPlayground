@@ -1,0 +1,87 @@
+﻿@inject IMemberData memberData
+@inject IInvoiceData invoiceData
+@using DamienPlaygroundLibrary.Data
+@using DisneyPlayhouseAppLibrary.Models
+@page "/ModifyTask"
+
+@if (showEditForm == false)
+{
+    <MudContainer MaxWidth="MaxWidth.ExtraLarge">
+        <MudPaper Elevation="0" Class="pa-4 ma-2 mb-4">
+            <MudSimpleTable Style="overflow-x: auto;" Hover="true" Bordered="true" Striped="true">
+                <thead>
+                    <tr>
+                        @foreach (var h in headings)
+                        {
+                            <th class="text-center">@h</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in rows)
+                    {
+                        <tr>
+                            <td class="text-center">@row.InvoiceId</td>
+                            <td class="text-center">@row.PageName</td>
+                            <td class="text-center">@row.PurchasedForId</td>
+                            <td class="text-center">@row.PurchasedById</td>
+                            <td class="text-center">@row.TotalBig</td>
+                            <td class="text-center">@row.TotalSmall</td>
+                            <td class="text-center">$@row.TotalAmount.ToString("0.00")</td>
+                            <td class="text-center">@row.LastUpdatedOn.DayOfWeek, @row.LastUpdatedOn</td>
+                            <td class="text-center">@row.isLocked</td>
+                            <td class="text-center">
+                                <MudFab Color="Color.Primary" Size="Size.Small" IconSize="Size.Small" StartIcon="@Icons.Material.Filled.Edit" OnClick="() => EditFixedDateForm(row.InvoiceId)" />
+                                <MudFab Color="Color.Error" Size="Size.Small" IconSize="Size.Small" StartIcon="@Icons.Material.Filled.Delete" Class="ml-2" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </MudSimpleTable>
+        </MudPaper>
+    </MudContainer>
+}
+
+@if (showEditForm == true)
+{
+    <FixedDateEditTable Entries="@entries" EditInvoiceId="@IdForEdit"  hideEditForm="HideEditForm"></FixedDateEditTable>
+}
+
+
+@code {
+    string[] headings = { "Invoice ID", "Page name", "Member ID", "Created By", "Big", "Small", "Ticket Amount", "Last Updated", "Locked Status", "Actions" };
+    private string? currentUserId = "";
+    [CascadingParameter] public Task<AuthenticationState> AuthStateTask { get; set; }
+    private List<Lib_FixedBetInvoiceDataModel> rows = new List<Lib_FixedBetInvoiceDataModel>();
+    List<Lib_FixedBetEntriesDataModel> entries = new List<Lib_FixedBetEntriesDataModel>();
+    private bool showEditForm = false;
+    private string IdForEdit = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUserId = AuthStateTask.Result.User.Identity.Name;
+        var names = await memberData.GetChildIdsOfMember(currentUserId);
+        names.Insert(0, currentUserId);
+
+        foreach(var name in names)
+        {
+            List<Lib_FixedBetInvoiceDataModel> data = await invoiceData.GetFixedBetInvoiceData(name);
+            foreach(var d in data)
+            {
+                rows.Add(d);
+            }
+        }
+    }
+
+    private async Task EditFixedDateForm(string invoiceId)
+    {
+        entries = await invoiceData.GetFixedBetEntriesByInvoiceId(invoiceId);
+        IdForEdit = invoiceId;
+        showEditForm = true;
+    }
+    
+    private async Task HideEditForm()
+    {
+        showEditForm = false;
+    }
+}

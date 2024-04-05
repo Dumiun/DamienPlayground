@@ -1,0 +1,25 @@
+﻿@page "/"
+@page "/Home"
+
+<PageTitle>Home</PageTitle>
+
+
+<MudText Typo="Typo.h2" GutterBottom="true">Welcome to Damien's Playground!</MudText>
+<MudText Class="mb-6" Typo="Typo.subtitle1">This website is developed with <b>MudBlazor</b>, <b>Bootstrap 5</b> and the <b>.NET 8</b> in Visual Studio 2022.</MudText>
+
+
+<MudCard>
+    <MudCardContent>
+        <MudAlert Severity="Severity.Normal" Variant="Variant.Filled">What does Damien's Playground showcase?</MudAlert>
+        <MudList Clickable="false">
+            <MudListItem Text="Implementation of .NET Core features such as Asynchronous, Dependency Injection, SSR and Signal R, Cross Platform Libraries, Entity Framework(Authorization, Authentication, Roles), etc" Icon="@Icons.Material.Filled.RadioButtonChecked" />
+            <MudListItem Text="Showcase of realistic Project requirements and implementations that are often used or replicated in actual projects." Icon="@Icons.Material.Filled.RadioButtonChecked" />
+            <MudListItem Text="Implementation of Third Party apps and interaction with the App through API such as Telegram bots, etc" Icon="@Icons.Material.Filled.RadioButtonChecked" />
+            <MudListItem Text="Database management and implementation using MSSQL through Stored Procedures, pre-defined tables, etc for modularity." Icon="@Icons.Material.Filled.RadioButtonChecked" />
+            <MudListItem Text="Separation of Class libraries and implementing them as services for re-usability of code and prevent repetition." Icon="@Icons.Material.Filled.RadioButtonChecked" />
+            <MudListItem Text="Usage of UI Libraries and CSS Libraries such as Bootstrap 5 and MudBlazor to implement modern and modular UI components." Icon="@Icons.Material.Filled.RadioButtonChecked" />
+        </MudList>
+    </MudCardContent>
+</MudCard>
+
+<br />

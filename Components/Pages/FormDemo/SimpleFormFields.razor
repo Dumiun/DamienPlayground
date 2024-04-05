@@ -1,0 +1,145 @@
+﻿@using DamienPlaygroundLibrary.Models
+
+    <MudItem xs="6" Style="height:5vh;">
+        <MudGrid>
+            <MudItem xs="1">
+            @if(entryCol.Number.Length == 4 && entryCol.Day.Length > 0 && (entryCol.Big > 0 || entryCol.Small > 0))
+            {
+                <MudIcon Icon="@Icons.Material.Filled.DoneAll" Size="Size.Large" Color="Color.Success" />
+            }
+            @if (entryCol.Number.Length != 4 && (entryCol.Big > 0 || entryCol.Small > 0))
+            {
+                <MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Large" Color="Color.Error" />
+            }
+            @if (entryCol.Number == "" && (entryCol.Big == 0 && entryCol.Small == 0))
+            {
+                <MudIcon Icon="@Icons.Material.Filled.Done" Size="Size.Large" Color="Color.Warning" />
+            }
+        </MudItem>
+            <MudItem xs="2">
+                <MudSelect @bind-Value="entryCol.Day" SelectedValuesChanged="UpdateField" Dense="true" T="string" Margin="Margin.Dense" Variant="Variant.Outlined" Style="text-align:center;">
+                @foreach(var day in Days)
+                {
+                    <MudSelectItem Value="@day">@day</MudSelectItem>
+                }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="3">
+                <MudTextField @bind-Value="entryCol.Number" @onfocusout="UpdateField" @oninput="UpdateField" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Numbers" AdornmentColor="Color.Warning"></MudTextField>
+            </MudItem>
+            <MudItem xs="2">
+                <MudNumericField HideSpinButtons="true" @onfocusout="UpdateField" @oninput="UpdateField" @bind-Value="entryCol.Big" Margin="Margin.Dense" Variant="Variant.Outlined" Min="0.0" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.FormatBold" AdornmentColor="Color.Warning" />
+            </MudItem>
+            <MudItem xs="2">
+                <MudNumericField HideSpinButtons="true" @onfocusout="UpdateField" @oninput="UpdateField" @bind-Value="entryCol.Small" Margin="Margin.Dense" Variant="Variant.Outlined" Min="0" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.StrikethroughS" AdornmentColor="Color.Warning" />
+            </MudItem>
+            <MudItem xs="2">
+                <MudSelect Dense="true" @bind-Value="entryCol.Roll" SelectedValuesChanged="UpdateField" T="string" Margin="Margin.Dense" Variant="Variant.Outlined" Style="text-align:center;">
+                    <MudSelectItem Value="@("")">&nbsp;</MudSelectItem>
+                    <MudSelectItem Value="@("F")">F</MudSelectItem>
+                    <MudSelectItem Value="@("B")">B</MudSelectItem>
+                    <MudSelectItem Value="@("R")">R</MudSelectItem>
+                    <MudSelectItem Value="@("I")">I</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+
+@code {
+    [Parameter] public int ColId { get; set; }
+    [Parameter] public Lib_BettingFormIndividualRowEntry entryCol { get; set; } = new Lib_BettingFormIndividualRowEntry();
+    [Parameter] public EventCallback<ValueTuple<Lib_BettingFormIndividualRowEntry, int>> ValueChangedUpdate { get; set; }
+    private List<string> Days = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Days  = GetAvailableDays().Select(x => x.ToString()).ToList();
+        entryCol.Day = Days[0];
+    }
+
+    private async Task UpdateField()
+    {
+        if (!int.TryParse(entryCol.Number, out int number))
+        {
+            entryCol.Number = "";
+        }
+
+        if(!double.TryParse(entryCol.Big.ToString(), out double big))
+        {
+            entryCol.Big = 0;
+        }
+        
+        if (!int.TryParse(entryCol.Small.ToString(), out int small))
+        {
+            entryCol.Small = 0;
+        }
+
+        //Check for valid Number Input
+        if(entryCol.Number.Length < 4 || entryCol.Number.Length > 4)
+        {
+            entryCol.Number = "";
+        }
+
+        //Check for valid Big Input
+        if (entryCol.Big % 1 != 0 && entryCol.Big % 1 != 0.5)
+        {
+            entryCol.Big = 0;
+        }
+
+        await ValueChangedUpdate.InvokeAsync((entryCol, ColId));
+    }
+
+    private List<int> GetAvailableDays()
+    {
+        DateTime currentDate = DateTime.Now;
+        // Check if today is Monday
+        if (currentDate.DayOfWeek == DayOfWeek.Monday)
+        {
+            return new List<int> { 1, 2, 3, 6, 7 };
+        }
+        // Check if today is Tuesday
+        if (currentDate.DayOfWeek == DayOfWeek.Tuesday)
+        {
+            return new List<int> { 1, 2, 3, 6, 7 };
+        }
+        // Check if today is Wednesday before 4pm
+        if (currentDate.DayOfWeek == DayOfWeek.Wednesday && currentDate.Hour < 16)
+        {
+            return new List<int> { 1, 2, 3, 6, 7 };
+        }
+        if (currentDate.DayOfWeek == DayOfWeek.Wednesday && currentDate.Hour > 16)
+        {
+            return new List<int> { 2, 6, 7 };
+        }
+        if (currentDate.DayOfWeek == DayOfWeek.Thursday)
+        {
+            return new List<int> { 2, 6, 7 };
+        }
+        if (currentDate.DayOfWeek == DayOfWeek.Friday)
+        {
+            return new List<int> { 2, 6, 7 };
+        }
+        // Check if today is Saturday before 4pm
+        if (currentDate.DayOfWeek == DayOfWeek.Saturday && currentDate.Hour < 16)
+        {
+            return new List<int> { 2, 6, 7 };
+        }
+        // Check if today is Saturday after 4pm
+        if (currentDate.DayOfWeek == DayOfWeek.Saturday && currentDate.Hour >= 16)
+        {
+            return new List<int> { 3, 7 };
+        }
+        // Check if today is Sunday before 4pm
+        if (currentDate.DayOfWeek == DayOfWeek.Sunday && currentDate.Hour < 16)
+        {
+            return new List<int> { 3, 7 };
+        }
+        // Check if today is Sunday after 4pm
+        if (currentDate.DayOfWeek == DayOfWeek.Sunday && currentDate.Hour >= 16)
+        {
+            return new List<int> { 1, 2, 3, 6, 7 };
+        }
+        // For all other cases, show all options
+        return new List<int> { 1, 2, 3, 6, 7 };
+    }
+}
